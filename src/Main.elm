@@ -52,17 +52,28 @@ init =
 
 ---- UPDATE ----
 type Msg
-  = Change Int String
-
+  = ChangeName Int String
+  | ChangeCity Int String
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    Change id newContent ->
+    ChangeName id newContent ->
       let
           updateEntry t =
               if t.id == id then
                   { t | name = newContent }
+              else
+                  t
+      in
+      ( { model | teams = List.map updateEntry model.teams }
+      , Cmd.none
+      )
+    ChangeCity id newContent ->
+      let
+          updateEntry t =
+              if t.id == id then
+                  { t | city = newContent }
               else
                   t
       in
@@ -74,9 +85,11 @@ update msg model =
 mapFunc : Team -> Html Msg
 mapFunc passedInTeam =
   div []
-    [  text passedInTeam.name
+    [  text (passedInTeam.name ++ " from " ++ passedInTeam.city)
     , br [] []
-    , input [ value passedInTeam.name, onInput (Change passedInTeam.id)] []
+    , input [ value passedInTeam.name, onInput (ChangeName passedInTeam.id)] []
+    , br [] []
+    , input [ value passedInTeam.city, onInput (ChangeCity passedInTeam.id)] []
     ]
 
 view : Model -> Html Msg
